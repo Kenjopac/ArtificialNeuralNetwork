@@ -45,15 +45,26 @@ def meanSquaredError(predicted, observed):
 def AverageCost(predictedlist,Observedlist):
     return sum(meanSquaredError(predictedlist , Observedlist)) / float(len(predictedlist))
 
-def BackProp(predictedlist, observedlist, w2, xvalues, alpha):
-    m = len(observedlist)
-    dCostdw = [(-2 / m) * sum([observedlist[n] - predictedlist[n] for n in range(m)]) * smval for smval in predictedlist]
-    dCostdw = [dCostdw[i] * xvalues[i] for i in range(len(dCostdw))]
-    w2 = [w2[t] - alpha * dCostdw[t] for t in range(len(dCostdw))]
-    return w2
-
+def BackProp(predictedlist, observedlist, actlayer1, alpha, w1,w2, b1,b2, input):
+  Cost = sum([pow (observedlist[a] - predictedlist[a] , 2) for a in range(len(predictedlist)) ])
+  dcostdw_two,dcostdb_two = []
+  for i in range(len(predictedlist)):
+    dcostdy = observedlist[i] - predictedlist[i]
+    dydz = predictedlist[i] * ( 1 - predictedlist[i])
+    dzdw = actlayer1[i]
+    dcostdb_two.append(-1 * dcostdy * dydz)
+    dcostdw_two.append(dcostdy * dydz * dzdw)
+  w2 = [w2[t] - alpha * dcostdw_two[t] for t in range(len(dcostdw_two))]
+  b2 = [b2[t] - alpha * dcostdb_two[t] for t in range(len(dcostdb_two)) ] 
+  dcostdw_one, dcostdb_one = []
+  for i in range(len(predictedlist) ):
+    dcostdw_one.append(dcostdw_two[i] * actlayer1[i] * (1 - actlayer1[i]) * input[i])
+    dcostdb_one.append(dcostdw_two[i] * actlayer1[i] * ( 1 - actlayer1[i]) * -1)
+  w2 - 
+  
+  
+  
 def PenguinsToDigits(trainset):
-
     return [0 if n == "Adelie" else 1 if n == "Chinstrap" else 2 for n in trainset]
 
 def oneHotY(observed):
@@ -73,5 +84,5 @@ if __name__ == "__main__":
     UnactLayer2, ActLayer2 = forwardprop(ActLayer1, w2,b2, softmax)
     for l in w2:
         print("original weights: ", l)
-        print("updated weights: ", BackProp(ActLayer2, ObservedYvectors[0] , l , UnactLayer2, 0.01))
+        print("updated weights: ", BackProp(ActLayer2, ObservedYvectors[0] , ActLayer1,0.01, w1,w2, firstdataset))
 
